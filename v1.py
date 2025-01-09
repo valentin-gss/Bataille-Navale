@@ -12,7 +12,7 @@ def clique_joueur(x, y):
         if bouton["bg"] == "gray":
             bouton.config(bg="red", state=tk.DISABLED)
             tour = "ordi"
-            label_tour.config(text="Tour : Ordinateur")
+            label_tour.config(text="Tour : Ordinateur", width=20)
             fenetre.after(1000, tour_ordinateur)
 
 def tour_ordinateur():
@@ -25,15 +25,17 @@ def tour_ordinateur():
             bouton.config(bg="red", state=tk.DISABLED)
             break
     tour = "joueur"
-    label_tour.config(text="Tour : Joueur")
+    label_tour.config(text="Tour : Joueur", width=20)
 
 # Fenêtre principale
 fenetre = tk.Tk()
 fenetre.title("Bataille Navale")
+fenetre.geometry("800x600")  # Taille fixe de la fenêtre
+fenetre.resizable(False, False)
 
 # Menu principal
 menu_frame = tk.Frame(fenetre)
-menu_frame.pack()
+menu_frame.pack(fill=tk.BOTH, expand=True)
 
 tk.Label(menu_frame, text="Bataille Navale", font=("Arial", 20, "bold")).pack(pady=20)
 
@@ -74,7 +76,7 @@ for i in range(10):
         ordi_plateau[i][j] = bouton
 
 # Indicateur de tour
-label_tour = tk.Label(jeu_frame, text="Votre tour", font=("Arial", 16, "bold"))
+label_tour = tk.Label(jeu_frame, text="Votre tour", font=("Arial", 16, "bold"), width=20)
 label_tour.pack()
 
 # Variables globales
