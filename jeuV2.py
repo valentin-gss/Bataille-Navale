@@ -36,6 +36,9 @@ frame_placement = None
 frame_battle = None
 label_infos = None
 entry_nom_joueur = None
+
+# Label pour afficher la difficulté choisie avec le slider
+label_difficulte = None
 difficulty_scale = None
 
 
@@ -164,6 +167,7 @@ def startGame():
     Lance la phase de placement pour le joueur.
     Place aussi les bateaux de l'IA aléatoirement.
     Récupère le nom du joueur depuis l'Entry du menu, et fixe joueur_courant.
+    Détermine la difficulté selon la valeur du slider (0 = Facile, 1 = Difficile).
     """
     global nom_joueur, joueur_courant
 
@@ -172,15 +176,12 @@ def startGame():
     if saisie != "":
         nom_joueur = saisie
 
-    # Mécanisme du slider : si < 0.5 => Facile, sinon => Difficile
+    # On lit la valeur du slider : 0 => Facile, 1 => Difficile
     scale_val = difficulty_scale.get()
-    if scale_val < 0.5:
-        difficulte_str = "Facile"
+    if scale_val == 0:
+        setDifficulte("Facile")
     else:
-        difficulte_str = "Difficile"
-
-    # On assigne la difficulté
-    setDifficulte(difficulte_str)
+        setDifficulte("Difficile")
 
     # On place l’IA
     genererPlacementAleatoire(grille_ia, bateaux_ia_restants)
@@ -445,7 +446,6 @@ def choisirTirDifficileIA():
             if 0 <= ii < TAILLE_GRILLE and 0 <= jj < TAILLE_GRILLE:
                 if grille_joueur[ii][jj] not in (EAU, TOUCHE):
                     return (ii, jj)
-
     return choisirTirAleatoireIA()
 
 
@@ -456,18 +456,29 @@ def setDifficulte(diff):
     difficulte = diff
 
 
+# ------------------- GESTION DU SLIDER ------------------- #
+def majLabelDifficulte(val):
+    """
+    Met à jour le label de difficulté en fonction de la valeur du slider (0 ou 1).
+    """
+    if float(val) == 0:
+        label_difficulte.config(text="Facile")
+    else:
+        label_difficulte.config(text="Difficile")
+
+
 # ------------------- CRÉATION DE L'INTERFACE ------------------- #
 
 def creerInterface():
     """
     Crée la fenêtre principale et les 3 frames : menu, placement, battle.
-    Ajoute un Entry pour le nom du joueur et un Scale pour la difficulté.
+    Ajoute un Entry pour le nom du joueur et un Scale pour la difficulté (2 positions).
     """
     global root, frame_menu, frame_placement, frame_battle
-    global label_infos, entry_nom_joueur, difficulty_scale
+    global label_infos, entry_nom_joueur, difficulty_scale, label_difficulte
 
     root = tk.Tk()
-    root.title("Bataille Navale (Version Joueur + Slider)")
+    root.title("Bataille Navale (Version Joueur + Slider à 2 positions)")
     root.geometry("800x600")
     root.config(bg="#ffffff")
 
@@ -483,9 +494,16 @@ def creerInterface():
     entry_nom_joueur.pack(pady=5)
 
     # Slider pour choisir la difficulté (0 = Facile, 1 = Difficile)
-    tk.Label(frame_menu, text="Choisissez la difficulté (glisser) :", bg="#ccf").pack(pady=5)
-    difficulty_scale = tk.Scale(frame_menu, from_=0, to=1, orient='horizontal',
-                                resolution=0.01, length=200, bg="#ccf")
+    tk.Label(frame_menu, text="Choisissez la difficulté (2 positions) :", bg="#ccf").pack(pady=5)
+
+    # Label qui affiche le texte "Facile" ou "Difficile"
+    label_difficulte = tk.Label(frame_menu, text="Facile", bg="#ccf", font=("Helvetica", 12, "bold"))
+    label_difficulte.pack(pady=2)
+
+    difficulty_scale = tk.Scale(frame_menu, from_=0, to=1, 
+                                orient='horizontal', resolution=1, length=200,
+                                bg="#ccf", command=majLabelDifficulte)
+    difficulty_scale.set(0)  # Valeur par défaut = Facile
     difficulty_scale.pack(pady=5)
 
     # Bouton pour commencer la partie
